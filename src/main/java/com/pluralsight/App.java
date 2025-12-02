@@ -35,6 +35,8 @@ public class App {
             System.out.println("""
                     1) Display all products
                     2) Display all customers
+                    3) Display all categories
+                    4) Display products based on category ID
                     0) Exit
                     Select an option:
                     """);
@@ -47,6 +49,11 @@ public class App {
                 case 2:
                     displayCustomers(connection);
                     break;
+                case 3:
+                    displayCategories(connection);
+                    break;
+                case 4:
+                    productCatSearch(connection);
                 case 0:
                     run = false;
             }
@@ -89,6 +96,49 @@ public class App {
         }
     }
 
+    public static void displayCategories(Connection connection) {
+        try
+            (PreparedStatement prepStatement = connection.prepareStatement("""
+                    SELECT CategoryID,
+                    CategoryName
+                    FROM
+                    Categories
+                    ORDER BY CategoryID;
+                    """);
+            ) {
+            ResultSet set = prepStatement.executeQuery();
+            printResults(set);
+        } catch(SQLException e) {
+            System.out.println("Oopsie daisy" + e.getMessage());
+        }
+    }
+
+    public static void productCatSearch(Connection connection) {
+        //prep statement must be in try
+        try
+            ( PreparedStatement prepStatement = connection.prepareStatement("""
+                    SELECT productID,
+                    productName,
+                    unitPrice,
+                    unitsInStock
+                    FROM
+                    Products p
+                    JOIN Categories c ON p.CategoryID = c.CategoryID
+                    WHERE p.CategoryID = ?
+                    """);
+            ){
+            System.out.println("Enter the category ID you wish to search for");
+            String catID = scanner.nextLine();
+            prepStatement.setString(1, catID);
+            //result set must be in try
+            try(ResultSet set = prepStatement.executeQuery()){
+                printResults(set);
+            }
+        } catch (SQLException e) {
+            System.out.println("Woospsie" + " " + e.getMessage());
+        }
+    }
+
     public static void printResults(ResultSet results) throws SQLException {
         //gets info about types and properties of columns in result set
         ResultSetMetaData metaData = results.getMetaData();
@@ -105,7 +155,7 @@ public class App {
                 //get the current column value
                 String value = results.getString(i);
                 //print out the column name and column value
-                System.out.println(columnName + ": " + value + " ");
+                System.out.printf("%-15s: %-20s%n", columnName, value);
             }
 
             //print an empty line to make the results prettier
