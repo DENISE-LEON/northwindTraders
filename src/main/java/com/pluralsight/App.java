@@ -47,7 +47,10 @@ public class App {
     public static void displayProducts(Connection connection) {
         try {
             PreparedStatement prepStatement = connection.prepareStatement("""
-                    SELECT *
+                    SELECT ProductID,
+                    ProductName,
+                    UnitPrice,
+                    UnitsInStock
                     FROM Products;
                     """);
             ResultSet set = prepStatement.executeQuery();
@@ -78,7 +81,7 @@ public class App {
             }
 
             //print an empty line to make the results prettier
-            System.out.println();
+            System.out.println("--------------------------------");
         }
     }
 }
