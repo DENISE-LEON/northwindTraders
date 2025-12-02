@@ -24,15 +24,19 @@ public class App {
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             menuOptions(connection);
         } catch (SQLException e) {
-
+            System.out.println("An oopsie" + e.getMessage());
         }
     }
 
     public static void menuOptions(Connection connection) {
-        while (true) {
+        boolean run = true;
+        while (run) {
             System.out.println("What do you want to do?");
             System.out.println("""
                     1) Display all products
+                    2) Display all customers
+                    0) Exit
+                    Select an option:
                     """);
             int menuChoice = scanner.nextInt();
             scanner.nextLine();
@@ -40,6 +44,11 @@ public class App {
                 case 1:
                     displayProducts(connection);
                 break;
+                case 2:
+                    displayCustomers(connection);
+                    break;
+                case 0:
+                    run = false;
             }
         }
     }
@@ -57,6 +66,25 @@ public class App {
             printResults(set);
 
         } catch (SQLException e) {
+            System.out.println("An oppsie" +  e.getMessage());
+        }
+    }
+
+    public static void displayCustomers(Connection connection) {
+        try {
+            PreparedStatement prepStatement = connection.prepareStatement("""
+                    SELECT ContactName,
+                    CompanyName,
+                    City,
+                    Country,
+                    Phone
+                    FROM Customers
+                    ORDER BY Country;
+                    """);
+            ResultSet set = prepStatement.executeQuery();
+            printResults(set);
+        } catch (SQLException e) {
+            System.out.println("An oopsie" + e.getMessage());
 
         }
     }
