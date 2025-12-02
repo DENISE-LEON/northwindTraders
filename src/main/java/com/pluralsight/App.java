@@ -1,5 +1,7 @@
 package com.pluralsight;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
 import java.sql.*;
 import java.util.Scanner;
 
@@ -21,7 +23,12 @@ public class App {
         String password = args[1];
         String url = "jdbc:mysql://localhost:3306/northwind";
 
-        try (Connection connection = DriverManager.getConnection(url, username, password)) {
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+
+        try (Connection connection = dataSource.getConnection()) {
             menuOptions(connection);
         } catch (SQLException e) {
             System.out.println("An oopsie" + e.getMessage());
